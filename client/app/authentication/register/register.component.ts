@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AppService } from 'client/app/service/app.service';
+import { LoaderService } from 'client/app/service/loader.service';
+import { ToastrService } from 'ngx-toastr';
 import { mustMatchPassword } from '../../helpers/password-match.validation';
 
 @Component({
@@ -12,7 +15,10 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private appService: AppService,
+    private loaderService: LoaderService,
+    private toastr: ToastrService
   ) {
     this.registerForm = this.fb.group({
       userName: ['', Validators.required],
@@ -40,11 +46,20 @@ export class RegisterComponent implements OnInit {
   }
 
   userSignUp(): void {
-
+    this.loaderService.show();
+    this.appService.post('/auth/register', this.registerForm.value).subscribe(
+      (response: any) => {
+        if(response.success){
+          this.toastr.success('Success', response.message);
+        } else {
+          this.toastr.error('Error', response.message);
+        }
+        this.loaderService.hide();
+      },
+      (error) => {
+        this.toastr.error('Error', error);
+        this.loaderService.hide();
+      }
+    )
   }
-
 }
-function mustMatchValidator(userPassword: any, confirmPassword: any): any {
-  throw new Error('Function not implemented.');
-}
-
