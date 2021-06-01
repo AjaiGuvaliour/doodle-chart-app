@@ -1,1 +1,44 @@
-<p>login works!</p>
+<div class="login-form-container">
+    <div class="card login-form">
+        <div class="card-body">
+            <h3 class="card-title text-center">Login</h3>
+            <div class="card-text">
+                <form [formGroup]="loginForm"> 
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input 
+                            id="email"
+                            type="email"
+                            class="form-control form-control-sm"
+                            formControlName="email">
+                            <span *ngIf="lF.email.touched && lF.email.errors">
+                                <span  *ngIf="lF.email.errors.required" class="form-error">Email is Required</span>
+                                <span  *ngIf="lF.email.errors.email" class="form-error">Not a valid Email</span>
+                            </span>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input
+                           type="password"
+                           id="password"
+                           formControlName="password"
+                           class="form-control form-control-sm">
+                        <span *ngIf="lF.password.touched && lF.password.errors">
+                            <span  *ngIf="lF.password.errors.required" class="form-error">Password is Required</span>
+                        </span>
+                    </div>
+                    <button
+                       type="submit" 
+                       [disabled]="loginForm.invalid"
+                       class="btn btn-primary btn-block" 
+                       (click)="userSignIn()">
+                            Sign in
+                    </button>
+                    <div class="sign-up">
+                        Don't have an account? <a href="" [routerLink]="'/auth/register'">Create One</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -5,6 +5,11 @@ import { AuthenticationModule } from './authentication/authentication.module';
 const routes: Routes = [
   {
     path: '',
+    redirectTo: 'auth',
+    pathMatch: 'full'
+  },
+  {
+    path: 'auth',
     loadChildren: () => AuthenticationModule
   }
 ];
