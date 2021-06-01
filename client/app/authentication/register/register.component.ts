@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { mustMatchPassword } from '../../helper/password-match.validation';
+import { mustMatchPassword } from '../../helpers/password-match.validation';
 
 @Component({
   selector: 'app-register',
