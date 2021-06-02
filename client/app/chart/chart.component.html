@@ -1,0 +1,69 @@
+<div class="chart-container h-100">
+    <div class="chart-contacts" [class]="toggleSidebar ? 'hide-chart-contacts' : ''">
+        <div class="chart-contacts-header">
+            <h5 class="header">Chats</h5>
+            <button type="submit" class="btn toogle-sidebar-btn" (click)="toggleSidebar = !toggleSidebar;">
+                <i class="fa fa-align-justify"></i>
+            </button>
+        </div>
+        <div class="chart-search-container">
+            <div class="chart-search">
+                <i class="fa fa-search"></i>
+                <input type="text" class="w-100" placeholder="What are you looking?" />
+            </div>
+        </div>
+        <div class="chart-contacts-list">
+            <ul class="perfect-scrollbar">
+                <li>
+                    <div class="profiles">
+                        <img src="../../assets/profile.jpg" alt="profile pic" />
+                        <div class="short-message">
+                            <span>
+                                Johans hena
+                            </span>
+                            <div>
+                                Hai iam ajai kumar bro sure
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="chart-message">
+        <div class="selected-chart-header d-flex">
+            <button type="submit" class="btn toogle-sidebar-btn" (click)="toggleSidebar = !toggleSidebar;">
+                <i class="fa fa-align-justify"></i>
+            </button>
+            <div class="profiles">
+                <img src="../../assets/profile.jpg" alt="profile pic" />
+                <div class="profile-name">
+                    <span>
+                        Johans hena
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="selected-charts perfect-scrollbar">
+            <ul class="messages">
+                <li class="sender">
+                    <div class="pull-left message-content">
+                        Hai
+                    </div>
+                </li>
+                <li class="reciver">
+                    <div class="pull-right message-content">
+                        bye
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="message-typing">
+            <textarea type="text" class="text-area form-control perfect-scrollbar"
+                placeholder="Type something here..."></textarea>
+            <button type="button" class="sending-btn btn btn-primary">
+                <i class="fa fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>

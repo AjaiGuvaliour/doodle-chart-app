@@ -8,3 +8,20 @@ body {
 .form-error {
 	color: red;
 }
+
+.perfect-scrollbar {
+    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-width: auto;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        width: 4px;
+        height: 4px;
+        background-color: lightgray;
+    }
+}

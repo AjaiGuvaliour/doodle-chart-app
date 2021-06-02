@@ -20,8 +20,9 @@ export class AppService {
       'content-type': 'application/json',
     }
   }
+
   private setAuthToken() {
-    const token: string = localStorage.getItem('token');
+    const token: string = sessionStorage.getItem('token');
     if (token) {
       this.header['token'] = token;
     }

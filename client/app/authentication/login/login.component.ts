@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AppService } from 'client/app/service/app.service';
 import { LoaderService } from 'client/app/service/loader.service';
 import { ToastrService } from 'ngx-toastr';
@@ -17,7 +18,8 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private appService: AppService,
     private loaderService: LoaderService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private router: Router
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -37,17 +39,19 @@ export class LoginComponent implements OnInit {
     this.appService.post('/auth/login', this.loginForm.value).subscribe(
       (response: any) => {
         if (response.success) {
-          this.toastr.success('Success', response.message);
+          this.toastr.success(response.message);
+          sessionStorage.setItem('token', response['data']['token']);
+          sessionStorage.setItem('userDetail', JSON.stringify(response['data']['userDetail']));
+          this.router.navigate(['/home']);
         } else {
-          this.toastr.error('Error', response.message);
+          this.toastr.error(response.message);
         }
         this.loaderService.hide();
       },
       (error) => {
-        this.toastr.error('Error', error);
+        this.toastr.error(error);
         this.loaderService.hide();
       }
     )
   }
-
 }
