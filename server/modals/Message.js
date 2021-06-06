@@ -10,11 +10,17 @@ const message = new mongoose.Schema({
     from: {
         type: Object
     },
+    to: {
+        type: Object
+    },
     sender: {
         type: String
     },
     reciver: {
         type: String
+    },
+    active: {
+        type: Boolean
     }
 });
 

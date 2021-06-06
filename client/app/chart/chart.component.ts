@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AppService } from '../service/app.service';
 import { ChartService } from '../service/chart.service';
 import { LoaderService } from '../service/loader.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-chart',
@@ -18,22 +19,21 @@ export class ChartComponent implements OnInit {
     chatingUser;
     message = '';
     messageList: any = [];
+    deleteMessagesIds = [];
 
     constructor(
         private chartService: ChartService,
         private appService: AppService,
         private loaderService: LoaderService,
+        private toastr: ToastrService,
         private router: Router
     ) {
     }
 
     ngOnInit(): void {
         this.getOtherUsers();
-        this.chartService.socket.on('message', (msg) => {
-            console.log('message', msg);
-        });
+        this.getMessages();
     }
-
 
     getOtherUsers(): void {
         const userDetails = this.chartService.getUserDetails();
@@ -53,8 +53,9 @@ export class ChartComponent implements OnInit {
 
     createChat(chatingUser: any) {
         this.chatingUser = chatingUser;
-        const room = `${this.loggedInUser.userName}-${this.chatingUser.userName}`;
+        const room = `${this.loggedInUser._id}-${this.chatingUser._id}`;
         this.message = '';
+        this.deleteMessagesIds = [];
         this.chartService.socket.emit('create',
             {
                 room: room,
@@ -62,36 +63,32 @@ export class ChartComponent implements OnInit {
                 chatingUser: chatingUser
             }
         );
-        // this.getMessageByUser();
-    }
-
-    getMessageByUser(): void {
-        const rooms = [
-            `${this.loggedInUser._id}-${this.chatingUser._id}`,
-            `${this.chatingUser._id}-${this.loggedInUser._id}`
-        ]
-        this.appService.post('/message/getMessage', { rooms: rooms }).subscribe((response: any) => {
-            if (response.success) {
-                this.messageList = response.data;
-            }
+        this.displayMessage({
+            sender: this.loggedInUser._id,
+            reciver: this.chatingUser._id
         })
     }
 
     sendMessage(): void {
-        const room = `${this.loggedInUser.userName}-${this.chatingUser.userName}`;
+        const room = `${this.loggedInUser._id}-${this.chatingUser._id}`;
+        const token = sessionStorage.getItem('token');
         this.chartService.socket.emit('message',
             {
                 room: room,
                 message: this.message,
                 from: this.loggedInUser,
+                to: this.chatingUser,
                 sender: this.loggedInUser._id,
-                reciver: this.chatingUser._id
+                reciver: this.chatingUser._id,
+                token: token
             }
         );
         this.message = '';
     }
 
     logout(): void {
+        const userData = this.chartService.getUserDetails();
+        this.chartService.socket.emit('logout', userData);
         sessionStorage.clear();
         this.router.navigate(['/auth/login']);
     }
@@ -101,5 +98,60 @@ export class ChartComponent implements OnInit {
         this.filteredUserList = this.userList.filter(el =>
             el.userName.toLowerCase().indexOf(value.toLowerCase()) != -1
         );
+    }
+
+    getMessages() {
+        this.chartService.socket.on('message', (msg) => {
+            console.log('message', msg);
+        });
+        this.chartService.socket.on('saveDataToDB', (response) => {
+            if (response.success) {
+                this.displayMessage(response);
+            }
+        });
+    }
+
+    displayMessage(response) {
+        const req = {
+            sender: response.sender,
+            reciver: response.reciver
+        }
+        this.appService.post('/message/getMessage', req).subscribe((response: any) => {
+            if (response.success) {
+                this.messageList = response.data;
+            }
+        })
+    }
+
+    selectMsgForDelete(selectedMessage) {
+        if (selectedMessage.sender === this.loggedInUser._id) {
+            const index = this.deleteMessagesIds.findIndex(el => el === selectedMessage._id);
+            if (index != -1) {
+                this.deleteMessagesIds.splice(index, 1);
+                selectedMessage.selected = false;
+            } else {
+                this.deleteMessagesIds.push(selectedMessage._id);
+                selectedMessage.selected = true;
+            }
+        }
+    }
+
+    deleteSelectedMsg() {
+        this.loaderService.show();
+        this.appService.post('/message/deleteMsg', { seletedIds: this.deleteMessagesIds }).subscribe((response: any) => {
+            if (response.success) {
+                this.loaderService.hide();
+                this.toastr.success(response.message);
+                this.deleteMessagesIds = [];
+                this.chartService.socket.emit('deleteMessage', {
+                    sender: this.loggedInUser._id,
+                    reciver: this.chatingUser._id,
+                });
+            }
+        },
+            (error) => {
+                this.toastr.error(error);
+                this.loaderService.hide();
+            })
     }
 }

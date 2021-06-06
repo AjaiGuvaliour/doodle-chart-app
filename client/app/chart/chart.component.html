@@ -43,14 +43,16 @@
                     </span>
                 </div>
             </div>
-            <div class="log-out">
+            <div class="header-icons">
+                <i class="fa fa-trash" *ngIf="deleteMessagesIds.length" aria-hidden="true" (click)="deleteSelectedMsg()"></i>
                 <i class="fa fa-sign-out" aria-hidden="true" (click)="logout()"></i>
             </div>
         </div>
         <div class="selected-charts perfect-scrollbar">
             <ul class="messages" *ngFor="let msg of messageList">
-                <li [class]="msg.room == '{{loggedInUser._id}}-{{chatingUser._id}}' ? 'sender' : 'reciver'">
-                    <div [class]="msg.room == '{{loggedInUser._id}}-{{chatingUser._id}}' ? 'pull-left' : 'pull-right' " class="message-content">
+                <li *ngIf="msg.active" [ngClass]="[msg.sender ==  loggedInUser._id ? 'reciver' : 'sender', msg.selected ? 'selectedMsg' : '']" 
+                    (click)="selectMsgForDelete(msg)">
+                    <div [ngClass]="msg.sender == loggedInUser._id ? 'pull-right' : 'pull-left' " class="message-content">
                         {{msg.message}}
                     </div>
                 </li>

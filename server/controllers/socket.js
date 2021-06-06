@@ -1,3 +1,5 @@
+const jwt = require('jsonwebtoken');
+const Message = require('../modals/Message');
 
 module.exports = socketModule = (server) => {
 
@@ -26,8 +28,8 @@ module.exports = socketModule = (server) => {
 
             socket.on('create', (data) => {
                 const room = getRoomId(data.room);
-                room ?  '' : connectionList.push(data.room);
-                const roomId = room ?  room : data.room;
+                room ? '' : connectionList.push(data.room);
+                const roomId = room ? room : data.room;
                 socket.join(roomId);
                 const index = chatUserList.findIndex(el => el._id == data.chatingUser._id);
                 if (index != -1) {
@@ -37,7 +39,23 @@ module.exports = socketModule = (server) => {
 
             socket.on('message', (data) => {
                 const room = getRoomId(data.room);
+                saveDataToDB(data);
                 socket.broadcast.to(room).emit('message', data);
+            });
+
+            socket.on('deleteMessage', (data) => {
+                io.emit('saveDataToDB', {
+                    success: true,
+                    sender: data.sender,
+                    reciver: data.reciver
+                });
+            });
+
+            socket.on('logout', (user) => {
+                const index = chatUserList.findIndex(el => el._id == user._id);
+                if (index != -1) {
+                    chatUserList.splice(index, -1);
+                }
             });
 
             const getRoomId = (roomId) => {
@@ -45,6 +63,39 @@ module.exports = socketModule = (server) => {
                     return item.split('-').every(el => roomId.includes(el));
                 });
                 return room[0];
+            }
+
+            const saveDataToDB = (data) => {
+                const chatData = {
+                    room: data.room,
+                    message: data.message,
+                    from: data.from,
+                    to: data.to,
+                    sender: data.sender,
+                    reciver: data.reciver,
+                    active: true
+                }
+                jwt.verify(data.token, 'doodleCloudKey', async (err, authData) => {
+                    if (err) {
+                    } else {
+                        let msgModel = new Message(chatData);
+                        await msgModel.save(
+                            (err) => {
+                                if (err) {
+                                    io.emit('saveDataToDB', {
+                                        success: false
+                                    });
+                                } else {
+                                    io.emit('saveDataToDB', {
+                                        success: true,
+                                        sender: data.sender,
+                                        reciver: data.reciver
+                                    });
+                                }
+                            }
+                        );
+                    }
+                })
             }
         });
     }

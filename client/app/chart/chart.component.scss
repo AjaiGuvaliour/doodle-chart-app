@@ -147,6 +147,8 @@
 }
 
 .reciver {
+    cursor: pointer;
+
     &::after {
         content: '';
         clear: both;
@@ -177,6 +179,7 @@
     }
 }
 .sender {
+    
     &::after {
         content: '';
         clear: both;
@@ -192,7 +195,7 @@
         display: flex;
         min-height: 55px;
         color: white;
-
+        
         &::before {
             width: 0;
             height: 0;
@@ -207,11 +210,20 @@
     }
 }
 
-.log-out {
+.header-icons {
     position: absolute;
     right: 5px;
     cursor: pointer;
     top: 20px;
+
+    i {
+        padding: 5px;
+    }
+}
+
+.selectedMsg {
+    background-color: #2ca7d20f;
+    padding: 10px;
 }
 
 @media only screen and (max-width: 800px) {

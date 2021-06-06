@@ -7,7 +7,7 @@ router.get('/userlist/:id', async (req, res) => {
     const id = req.params.id;
     jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
         if (err) {
-            res.send({ success: false, message: 'Session Out Please Login' });
+            res.send({ success: false, message: 'Session out please login' });
         } else {
             await User.find({ _id: { $ne: id } },
                 {

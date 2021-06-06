@@ -3,43 +3,13 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const Message = require('../modals/Message');
 
-router.post('/saveChat', async (req, res) => {
-    const chatData = req.body.chatData;
-    jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
-        if (err) {
-            res.send({ success: false, message: 'Session Out Please Login' });
-        } else {
-            let msgModel = new Message(chatData);
-            await msgModel.save(
-                (err) => {
-                    if (err) {
-                        return res.send(
-                            {
-                                message: '',
-                                success: false
-                            }
-                        )
-                    } else {
-                        return res.send(
-                            {
-                                message: 'Message Saved',
-                                success: true
-                            }
-                        )
-                    }
-                }
-            );
-        }
-    })
-});
-
 router.post('/getMessage', async (req, res) => {
-    const rooms  = req.body.rooms;
+    const { sender, reciver } = req.body;
     jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
         if (err) {
-            res.send({ success: false, message: 'Session Out Please Login' });
+            res.send({ success: false, message: 'Session out please login' });
         } else {
-            await Message.find({ room: {$in: rooms} },
+            await Message.find({ room: { $in: [`${sender}-${reciver}`, `${reciver}-${sender}`] }, active: true },
                 (err, response) => {
                     if (response) {
                         return res.send(
@@ -52,13 +22,52 @@ router.post('/getMessage', async (req, res) => {
                     } else {
                         return res.send(
                             {
-                                message: 'No Message Found',
+                                message: 'No message found',
                                 success: false
                             }
                         );
                     }
                 }
 
+            );
+        }
+    })
+});
+
+router.post('/deleteMsg', async (req, res) => {
+    const { seletedIds } = req.body;
+    jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
+        if (err) {
+            res.send({ success: false, message: 'Session out please login' });
+        }
+        else {
+            await Message.bulkWrite(
+                seletedIds.map((data) =>
+                ({
+                    updateOne: {
+                        filter: { _id: data },
+                        update: { $set: { active: false } }
+                    }
+                })
+                ),
+                (err, response) => {
+                    if (response) {
+                        return res.send(
+                            {
+                                message: 'Successfully deleted the message.',
+                                success: true,
+                                data: response
+                            }
+                        );
+                    } else {
+                        return res.send(
+                            {
+                                message: "message can't be deleted.",
+                                success: false
+                            }
+                        );
+                    }
+                }
             );
         }
     })
