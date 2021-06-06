@@ -8,6 +8,8 @@ import { AppService } from './service/app.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { AuthGuard } from './gaurd/auth.guard';
+import { ChartService } from './service/chart.service';
+import { LoaderService } from './service/loader.service';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,8 @@ import { AuthGuard } from './gaurd/auth.guard';
   ],
   providers: [
     AppService,
+    ChartService,
+    LoaderService,
     AuthGuard
   ],
   bootstrap: [AppComponent]

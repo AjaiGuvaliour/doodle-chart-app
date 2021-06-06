@@ -50,14 +50,14 @@ export class RegisterComponent implements OnInit {
     this.appService.post('/auth/register', this.registerForm.value).subscribe(
       (response: any) => {
         if(response.success){
-          this.toastr.success('Success', response.message);
+          this.toastr.success(response.message);
         } else {
-          this.toastr.error('Error', response.message);
+          this.toastr.error(response.message);
         }
         this.loaderService.hide();
       },
       (error) => {
-        this.toastr.error('Error', error);
+        this.toastr.error(error);
         this.loaderService.hide();
       }
     )

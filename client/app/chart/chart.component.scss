@@ -41,6 +41,11 @@
         li {
             padding: 10px;
             border-bottom: 1px solid #a9a8a82b;
+            cursor: pointer;
+        }
+
+        .selected-user {
+            border-right: 5px solid #0000ff99;
         }
     }
   }
@@ -200,6 +205,13 @@
             border-color: transparent #0d6efd transparent transparent;
         }
     }
+}
+
+.log-out {
+    position: absolute;
+    right: 5px;
+    cursor: pointer;
+    top: 20px;
 }
 
 @media only screen and (max-width: 800px) {

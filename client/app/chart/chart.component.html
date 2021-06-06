@@ -9,24 +9,24 @@
         <div class="chart-search-container">
             <div class="chart-search">
                 <i class="fa fa-search"></i>
-                <input type="text" class="w-100" placeholder="What are you looking?" />
+                <input type="text" class="w-100" (input)="searchInputs($event)" placeholder="What are you looking?" />
             </div>
         </div>
         <div class="chart-contacts-list">
             <ul class="perfect-scrollbar">
-                <li>
-                    <div class="profiles">
-                        <img src="../../assets/profile.jpg" alt="profile pic" />
-                        <div class="short-message">
-                            <span>
-                                Johans hena
-                            </span>
-                            <div>
-                                Hai iam ajai kumar bro sure
+                <ng-container *ngFor="let user of filteredUserList">
+                    <li *ngIf="loggedInUser._id != user._id"
+                        [class]="user._id == chatingUser._id ? 'selected-user' : '' " (click)="createChat(user);">
+                        <div class="profiles">
+                            <img src="../../assets/profile.jpg" alt="profile pic" />
+                            <div class="short-message">
+                                <span>
+                                    {{user.userName}}
+                                </span>
                             </div>
                         </div>
-                    </div>
-                </li>
+                    </li>
+                </ng-container>
             </ul>
         </div>
     </div>
@@ -39,29 +39,27 @@
                 <img src="../../assets/profile.jpg" alt="profile pic" />
                 <div class="profile-name">
                     <span>
-                        Johans hena
+                        {{loggedInUser?.userName}}
                     </span>
                 </div>
             </div>
+            <div class="log-out">
+                <i class="fa fa-sign-out" aria-hidden="true" (click)="logout()"></i>
+            </div>
         </div>
         <div class="selected-charts perfect-scrollbar">
-            <ul class="messages">
-                <li class="sender">
-                    <div class="pull-left message-content">
-                        Hai
-                    </div>
-                </li>
-                <li class="reciver">
-                    <div class="pull-right message-content">
-                        bye
+            <ul class="messages" *ngFor="let msg of messageList">
+                <li [class]="msg.room == '{{loggedInUser._id}}-{{chatingUser._id}}' ? 'sender' : 'reciver'">
+                    <div [class]="msg.room == '{{loggedInUser._id}}-{{chatingUser._id}}' ? 'pull-left' : 'pull-right' " class="message-content">
+                        {{msg.message}}
                     </div>
                 </li>
             </ul>
         </div>
         <div class="message-typing">
-            <textarea type="text" class="text-area form-control perfect-scrollbar"
+            <textarea type="text" [(ngModel)]="message" class="text-area form-control perfect-scrollbar"
                 placeholder="Type something here..."></textarea>
-            <button type="button" class="sending-btn btn btn-primary">
+            <button type="button" class="sending-btn btn btn-primary" (click)="sendMessage()">
                 <i class="fa fa-paper-plane"></i>
             </button>
         </div>

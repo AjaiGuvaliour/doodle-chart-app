@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../modals/Authentiaction');
-const validationMsg = require('../helpers/validation-error');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
+const User = require('../modals/Authentiaction');
+const validationMsg = require('../helpers/validation-error');
 
 router.post('/login', async (req, res) => {
     let { email, password } = req.body;
-    User.findOne(
+    await User.findOne(
         {
             email
         }, async (err, response) => {
@@ -17,35 +17,32 @@ router.post('/login', async (req, res) => {
                 if (decryptPass) {
                     jwt.sign({ user: response.userName }, 'doodleCloudKey', { expiresIn: '1d' }, (err, token) => {
                         if (token) {
-                            return res.json(
+                            return res.status(200).send(
                                 {
                                     message: 'Successfully logged in',
                                     success: true,
                                     data: {
                                         token: `${token}`,
-                                        userDetail: { name: response.userName, email: email }
-                                    },
-                                    status: 200
+                                        userDetail: { userName: response.userName, email: email, _id: response.id }
+                                    }
                                 }
                             );
                         }
                     })
                 } else {
-                    return res.json(
+                    return res.send(
                         {
                             message: 'Password not matched',
-                            success: false,
-                            status: 400
+                            success: false
                         }
                     );
                 }
             }
             else {
-                res.status(200).send(
+                res.send(
                     {
                         message: 'user not found',
-                        success: false,
-                        status: 400
+                        success: false
                     }
                 )
             }
@@ -64,22 +61,20 @@ router.post('/register', async (req, res) => {
         }
     );
     await userModel.save(
-        async (err, resp) => {
+        async (err) => {
             if (err) {
                 const msg = await validationMsg(err['errors']);
-                res.status(400).send(
+                res.send(
                     {
                         message: msg,
-                        success: false,
-                        status: 400
+                        success: false
                     }
                 )
             } else {
-                res.status(200).send(
+                res.send(
                     {
                         message: 'Successfully registered',
-                        success: true,
-                        status: 200
+                        success: true
                     }
                 )
             }

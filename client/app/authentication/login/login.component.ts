@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AppService } from 'client/app/service/app.service';
+import { ChartService } from 'client/app/service/chart.service';
 import { LoaderService } from 'client/app/service/loader.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -18,6 +19,7 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private appService: AppService,
     private loaderService: LoaderService,
+    private chartService: ChartService,
     private toastr: ToastrService,
     private router: Router
   ) {
@@ -42,11 +44,15 @@ export class LoginComponent implements OnInit {
           this.toastr.success(response.message);
           sessionStorage.setItem('token', response['data']['token']);
           sessionStorage.setItem('userDetail', JSON.stringify(response['data']['userDetail']));
-          this.router.navigate(['/home']);
+          this.chartService.socket.emit('userLoggedIn', response['data']['userDetail']);
+          this.chartService.socket.once('socketForLoggedInUser', () => {
+            this.loaderService.hide();
+            this.router.navigate(['/home/chart']);
+          });
         } else {
           this.toastr.error(response.message);
+          this.loaderService.hide();
         }
-        this.loaderService.hide();
       },
       (error) => {
         this.toastr.error(error);
