@@ -49,8 +49,8 @@
         </div>
         <div class="selected-charts perfect-scrollbar">
             <ul class="messages" *ngFor="let msg of messageList">
-                <li [class]="msg.room == '{{loggedInUser._id}}-{{chatingUser._id}}' ? 'sender' : 'reciver'">
-                    <div [class]="msg.room == '{{loggedInUser._id}}-{{chatingUser._id}}' ? 'pull-left' : 'pull-right' " class="message-content">
+                <li [class]="msg.sender ==  loggedInUser._id ? 'reciver' : 'sender'">
+                    <div [class]="msg.sender == loggedInUser._id ? 'pull-right' : 'pull-left' " class="message-content">
                         {{msg.message}}
                     </div>
                 </li>

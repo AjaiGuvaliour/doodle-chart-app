@@ -29,11 +29,8 @@ export class ChartComponent implements OnInit {
 
     ngOnInit(): void {
         this.getOtherUsers();
-        this.chartService.socket.on('message', (msg) => {
-            console.log('message', msg);
-        });
+        this.getMessages();
     }
-
 
     getOtherUsers(): void {
         const userDetails = this.chartService.getUserDetails();
@@ -53,7 +50,7 @@ export class ChartComponent implements OnInit {
 
     createChat(chatingUser: any) {
         this.chatingUser = chatingUser;
-        const room = `${this.loggedInUser.userName}-${this.chatingUser.userName}`;
+        const room = `${this.loggedInUser._id}-${this.chatingUser._id}`;
         this.message = '';
         this.chartService.socket.emit('create',
             {
@@ -62,36 +59,32 @@ export class ChartComponent implements OnInit {
                 chatingUser: chatingUser
             }
         );
-        // this.getMessageByUser();
-    }
-
-    getMessageByUser(): void {
-        const rooms = [
-            `${this.loggedInUser._id}-${this.chatingUser._id}`,
-            `${this.chatingUser._id}-${this.loggedInUser._id}`
-        ]
-        this.appService.post('/message/getMessage', { rooms: rooms }).subscribe((response: any) => {
-            if (response.success) {
-                this.messageList = response.data;
-            }
+        this.displayMessage({
+            sender: this.loggedInUser._id,
+            reciver: this.chatingUser._id
         })
     }
 
     sendMessage(): void {
-        const room = `${this.loggedInUser.userName}-${this.chatingUser.userName}`;
+        const room = `${this.loggedInUser._id}-${this.chatingUser._id}`;
+        const token = sessionStorage.getItem('token');
         this.chartService.socket.emit('message',
             {
                 room: room,
                 message: this.message,
                 from: this.loggedInUser,
+                to: this.chatingUser,
                 sender: this.loggedInUser._id,
-                reciver: this.chatingUser._id
+                reciver: this.chatingUser._id,
+                token: token
             }
         );
         this.message = '';
     }
 
     logout(): void {
+        const userData = this.chartService.getUserDetails();
+        this.chartService.socket.emit('logout', userData);
         sessionStorage.clear();
         this.router.navigate(['/auth/login']);
     }
@@ -101,5 +94,28 @@ export class ChartComponent implements OnInit {
         this.filteredUserList = this.userList.filter(el =>
             el.userName.toLowerCase().indexOf(value.toLowerCase()) != -1
         );
+    }
+
+    getMessages() {
+        this.chartService.socket.on('message', (msg) => {
+            console.log('message', msg);
+        });
+        this.chartService.socket.on('saveDataToDB', (response) => {
+            if (response.success) {
+                this.displayMessage(response);
+            }
+        });
+    }
+
+    displayMessage(response) {
+        const req = {
+            sender: response.sender,
+            reciver: response.reciver
+        }
+        this.appService.post('/message/getMessage', req).subscribe((response: any) => {
+            if (response.success) {
+                this.messageList = response.data;
+            }
+        })
     }
 }

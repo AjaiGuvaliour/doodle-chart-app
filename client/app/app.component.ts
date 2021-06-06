@@ -17,7 +17,9 @@ export class AppComponent implements OnDestroy {
     ) {
         this.loadSubscription = this.loaderService.loader.subscribe(
             (response: any) => {
-                this.loader = response;
+                setTimeout(() => {
+                    this.loader = response;
+                });
             }
         )
     }
