@@ -157,20 +157,24 @@ export class ChartComponent implements OnInit {
 
     backupMsg() {
         this.loaderService.show();
-        this.appService.get('/message/retriveMsg').subscribe((response: any) => {
-            if (response.success) {
-                this.loaderService.hide();
-                this.toastr.success(response.message);
-                this.chartService.socket.emit('retriveData', {
-                    sender: this.loggedInUser._id,
-                    reciver: this.chatingUser._id,
-                });
-            }
-        },
-            (error) => {
-                this.toastr.error(error);
-                this.loaderService.hide();
-            }
-        );
+        this.appService.post('/message/retriveMsg',
+            {
+                sender: this.loggedInUser._id,
+                reciver: this.chatingUser._id
+            }).subscribe((response: any) => {
+                if (response.success) {
+                    this.loaderService.hide();
+                    this.toastr.success(response.message);
+                    this.chartService.socket.emit('retriveData', {
+                        sender: this.loggedInUser._id,
+                        reciver: this.chatingUser._id,
+                    });
+                }
+            },
+                (error) => {
+                    this.toastr.error(error);
+                    this.loaderService.hide();
+                }
+            );
     }
 }

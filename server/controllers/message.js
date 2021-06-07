@@ -34,13 +34,84 @@ router.post('/getMessage', async (req, res) => {
     })
 });
 
-router.get('/retriveMsg', async (req, res) => {
+router.post('/deleteMessage', async (req, res) => {
+    const { sender, reciver } = req.body;
+    jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
+        if (err) {
+            res.send({ success: false, message: 'Session out please login' });
+        } else {
+            await Message.find({ room: { $in: [`${sender}-${reciver}`, `${reciver}-${sender}`] }, active: true },
+                (err, response) => {
+                    if (response) {
+                        return res.send(
+                            {
+                                message: 'Successfully get the message.',
+                                success: true,
+                                data: response
+                            }
+                        );
+                    } else {
+                        return res.send(
+                            {
+                                message: 'No message found',
+                                success: false
+                            }
+                        );
+                    }
+                }
+
+            );
+        }
+    })
+});
+
+router.post('/deleteMsg', async (req, res) => {
+    const { seletedIds } = req.body;
     jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
         if (err) {
             res.send({ success: false, message: 'Session out please login' });
         }
         else {
-            await Message.updateMany({}, { $set: { active: true } },
+            await Message.bulkWrite(
+                seletedIds.map((data) =>
+                ({
+                    updateOne: {
+                        filter: { _id: data },
+                        update: { $set: { active: false } }
+                    }
+                })
+                ),
+                (err, response) => {
+                    if (response) {
+                        return res.send(
+                            {
+                                message: 'Successfully deleted the message.',
+                                success: true,
+                                data: response
+                            }
+                        );
+                    } else {
+                        return res.send(
+                            {
+                                message: "message can't be deleted.",
+                                success: false
+                            }
+                        );
+                    }
+                }
+            );
+        }
+    })
+});
+
+router.post('/retriveMsg', async (req, res) => {
+    const { sender, reciver } = req.body;
+    jwt.verify(req.headers.token, 'doodleCloudKey', async (err, authData) => {
+        if (err) {
+            res.send({ success: false, message: 'Session out please login' });
+        }
+        else {
+            await Message.updateMany({ room: { $in: [`${sender}-${reciver}`, `${reciver}-${sender}`] }}, { $set: { active: true } },
                 (err, response) => {
                     if (response) {
                         return res.send(
