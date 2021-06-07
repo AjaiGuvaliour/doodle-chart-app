@@ -143,7 +143,7 @@ export class ChartComponent implements OnInit {
                 this.loaderService.hide();
                 this.toastr.success(response.message);
                 this.deleteMessagesIds = [];
-                this.chartService.socket.emit('deleteMessage', {
+                this.chartService.socket.emit('retriveData', {
                     sender: this.loggedInUser._id,
                     reciver: this.chatingUser._id,
                 });
@@ -153,5 +153,24 @@ export class ChartComponent implements OnInit {
                 this.toastr.error(error);
                 this.loaderService.hide();
             })
+    }
+
+    backupMsg() {
+        this.loaderService.show();
+        this.appService.get('/message/retriveMsg').subscribe((response: any) => {
+            if (response.success) {
+                this.loaderService.hide();
+                this.toastr.success(response.message);
+                this.chartService.socket.emit('retriveData', {
+                    sender: this.loggedInUser._id,
+                    reciver: this.chatingUser._id,
+                });
+            }
+        },
+            (error) => {
+                this.toastr.error(error);
+                this.loaderService.hide();
+            }
+        );
     }
 }

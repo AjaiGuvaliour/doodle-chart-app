@@ -44,8 +44,9 @@
                 </div>
             </div>
             <div class="header-icons">
-                <i class="fa fa-trash" *ngIf="deleteMessagesIds.length" aria-hidden="true" (click)="deleteSelectedMsg()"></i>
-                <i class="fa fa-sign-out" aria-hidden="true" (click)="logout()"></i>
+                <i class="fa fa-database" title="backup" (click)="backupMsg()"></i>
+                <i class="fa fa-trash" title="delete" *ngIf="deleteMessagesIds.length" aria-hidden="true" (click)="deleteSelectedMsg()"></i>
+                <i class="fa fa-sign-out" title="logout" aria-hidden="true" (click)="logout()"></i>
             </div>
         </div>
         <div class="selected-charts perfect-scrollbar">
@@ -53,7 +54,9 @@
                 <li *ngIf="msg.active" [ngClass]="[msg.sender ==  loggedInUser._id ? 'reciver' : 'sender', msg.selected ? 'selectedMsg' : '']" 
                     (click)="selectMsgForDelete(msg)">
                     <div [ngClass]="msg.sender == loggedInUser._id ? 'pull-right' : 'pull-left' " class="message-content">
-                        {{msg.message}}
+                       <div class="message">
+                            {{msg.message}}
+                       </div> 
                     </div>
                 </li>
             </ul>

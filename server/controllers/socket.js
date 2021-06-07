@@ -43,7 +43,7 @@ module.exports = socketModule = (server) => {
                 socket.broadcast.to(room).emit('message', data);
             });
 
-            socket.on('deleteMessage', (data) => {
+            socket.on('retriveData', (data) => {
                 io.emit('saveDataToDB', {
                     success: true,
                     sender: data.sender,
